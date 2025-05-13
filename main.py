@@ -10,7 +10,7 @@ app = FastAPI()
 
 @app.on_event("startup")
 def startup():
-    crud.__init__excel()
+    crud.init_excel()
 
 @app.post("/users/")
 def create_user(user: User):

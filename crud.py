@@ -6,7 +6,7 @@ from fastapi import HTTPException
 DB_PATH = "db.xlsx"
 DELETED_PATH = "deleted.xlsx"
 
-def __init_excel():
+def init_excel():
     try:
         wb = openpyxl.load_workbook(DB_PATH)
     except FileNotFoundError:
@@ -24,8 +24,6 @@ def __init_excel():
 
         wb.save(DB_PATH)
 
-# Inicializa el archivo si no existe
-__init_excel()
 
 # -------------------------- USUARIOS --------------------------
 
@@ -57,13 +55,36 @@ def get_user_by_code(code: str) -> User:
             return User(id=row[0].value, name=row[1].value, code=row[2].value, id_deleted=row[3].value)
     raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-def get_all_users() -> List[User]:
-    wb = openpyxl.load_workbook(DB_PATH)
-    ws = wb["Users"]
-    return [
-        User(id=row[0].value, name=row[1].value, code=row[2].value, id_deleted=row[3].value)
-        for row in ws.iter_rows(min_row=2)
-    ]
+def get_all_users():
+    users = []
+    try:
+        # Abrimos el archivo Excel
+        wb = openpyxl.load_workbook("db.xlsx")
+        sheet = wb["Users"]  # Asegúrate de que la hoja se llama "Users"
+
+        for row in sheet.iter_rows(min_row=2):  # Saltamos encabezados
+            # Convertimos la fila en una lista de valores
+            values = [cell.value for cell in row]
+
+            # Verificamos que tenga al menos 4 columnas válidas
+            if len(values) >= 4 and all(v is not None for v in values[:4]):
+                try:
+                    # Creamos el objeto User y lo agregamos a la lista
+                    users.append(User(
+                        id=int(values[0]),
+                        name=str(values[1]),
+                        code=str(values[2]),
+                        id_deleted=bool(values[3])
+                    ))
+                except Exception as e:
+                    print(f"Error procesando fila: {values} -> {e}")
+            else:
+                print(f"Fila incompleta o vacía: {values}")
+
+    except Exception as e:
+        print(f"Error al leer el archivo Excel: {e}")
+
+    return users
 
 def get_active_users() -> List[User]:
     return [user for user in get_all_users() if not user.id_deleted]
