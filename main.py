@@ -70,3 +70,24 @@ def search_tmdb(title: str):
         for movie in results
     ]
     return filtered
+
+@app.get("/users/")
+def list_all_users():
+    return crud.get_all_users()
+
+@app.get("/users/active/")
+def list_active_users():
+    return crud.get_active_users()
+
+@app.get("/users/deleted/")
+def list_deleted_users():
+    return crud.get_deleted_users()
+
+@app.get("/users/{code}")
+def get_user(code: str):
+    return crud.get_user_by_code(code)
+
+@app.delete("/users/{code}")
+def delete_user(code: str):
+    crud.delete_user_by_code(code)
+    return {"msg": "Usuario marcado como eliminado"}
