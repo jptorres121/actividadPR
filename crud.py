@@ -25,12 +25,28 @@ def get_user_by_id(user_id: int) -> Optional [User]:
             return User(id=row[0].value, name=row[1].value)
     return None
 
-
 def create_user(user: User):
     wb = openpyxl.load_workbook(DB_PATH)
     ws = wb["Users"]
-    ws.append([user.id, user.name])
+    new_is = ws.max_row
+    ws.append([user.id, user.name, user.code, False])
     wb.save(DB_PATH)
+
+def get_user_by_code(code: str) -> User:
+    wb = openpyxl.load_workbook(DB_PATH)
+    ws = wb["Users"]
+    for row in ws.iter_rows(min_row=2):
+        if row[2].value == code:
+            return User(id=row[0].value, name=row[1].value, code=row[2].value, id_deleted=row[3].value)
+    raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+def get_all_users() -> List[User]:
+    wb = openpyxl.load_workbook(DB_PATH)
+    ws = wb["Users"]
+    return [
+        User(id=row[0].value, name=row[1].value, code=row[2].value, id_deleted=row[3].value)
+        for row in ws.iter_rows(min_row=2)
+    ]
 
 def get_all_movies(include_deleted: bool = False) -> List[Movie]:
     wb = openpyxl.load_workbook(DB_PATH)

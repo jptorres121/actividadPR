@@ -1,8 +1,10 @@
 from pydantic import BaseModel
 from typing import Optional
 
-class UserCreate(BaseModel):
+class User(BaseModel):
+    id: int
     name: str
+    code: str
     id_deleted: bool = False
 
 class MovieCreate(BaseModel):
