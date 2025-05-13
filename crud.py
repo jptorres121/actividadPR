@@ -48,6 +48,12 @@ def get_all_users() -> List[User]:
         for row in ws.iter_rows(min_row=2)
     ]
 
+def get_active_users() -> List[User]:
+    return [user for user in get_all_users() if not user.id_deleted]
+
+def get_deleted_users() -> List[User]:
+    return [user for user in get_all_users() if user.id_deleted]
+
 def get_all_movies(include_deleted: bool = False) -> List[Movie]:
     wb = openpyxl.load_workbook(DB_PATH)
     ws = wb["Movies"]
