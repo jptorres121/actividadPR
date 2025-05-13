@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from models import User, Movie
-from schemas import UserCreate, MovieCreate
+from schemas import User, MovieCreate
 from typing import List
 import crud
 import operations
@@ -13,7 +13,7 @@ def startup():
     crud.__init__excel()
 
 @app.post("/users/")
-def create_user(user: UserCreate):
+def create_user(user: User):
     users = crud.get_all_users()
     new_user = User(id = len(users) + 1, name = user.name)
     crud.create_user(new_user)

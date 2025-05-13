@@ -4,7 +4,7 @@ from typing import Optional
 class User(BaseModel):
     id: int
     name: str
-    code: str
+    code: int
     id_deleted: bool = False
 
 class MovieCreate(BaseModel):
